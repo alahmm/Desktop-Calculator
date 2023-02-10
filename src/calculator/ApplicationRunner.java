@@ -18,14 +18,13 @@ class Calculator extends JFrame{
     public void initComponents() {
         JTextField EquationTextField = new JTextField();
         EquationTextField.setBounds(10,10, 265,30);
+        EquationTextField.setName("EquationTextField");
         add(EquationTextField);
         /**
          * pannel for buttons
          */
         JPanel panel = new JPanel(new GridLayout(4, 5));
         panel.setBounds(10,45,265,210);
-        //panel.setLayout(new BorderLayout());
-        //panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         add(panel);
 
         /**
@@ -112,7 +111,7 @@ class Calculator extends JFrame{
         JButton Multiply = new JButton();
         Multiply.setName("Multiply");
         Multiply.setBounds(200, 55, 40, 40);
-        Multiply.setText("*");
+        Multiply.setText("x");
         panel.add(Multiply);
         Multiply.addActionListener(e -> {
             String content = EquationTextField.getText();
@@ -179,11 +178,12 @@ class Calculator extends JFrame{
         JButton Equals = new JButton();
         Equals.setBounds(140, 155, 40, 40);
         Equals.setText("=");
+        Equals.setName("Equals");
         panel.add(Equals);
         Equals.addActionListener(e -> {
             String equation = EquationTextField.getText();
             int[] array = new int[2];
-            String[] arrayOfString = equation.split("[+-/*]");
+            String[] arrayOfString = equation.split("[+-/x]");
             array[0] = Integer.parseInt(arrayOfString[0]);
             array[1] = Integer.parseInt(arrayOfString[1]);
             String operator = "";
@@ -192,12 +192,12 @@ class Calculator extends JFrame{
                 operator += equation.charAt(i);
                 if (operator.matches("\\d")) {
                     operator = "";
-                } else if (operator.matches("[+-/*]")){
+                } else if (operator.matches("[+-/x]")){
                     switch (operator) {
                         case "+" -> result = array[0] + array[1];
                         case "-" -> result = array[0] - array[1];
                         case "/" -> result = (float) array[0] / array[1];
-                        case "*" -> result = array[0] * array[1];
+                        case "x" -> result = array[0] * array[1];
                     }
                 }
             }
@@ -218,10 +218,9 @@ class Calculator extends JFrame{
         panel.add(Subtract);
         Subtract.addActionListener(e -> {
             String content = EquationTextField.getText();
-             content += Subtract.getText();
+            content += Subtract.getText();
             EquationTextField.setText(content);
         });
-
     }
 }
 public class ApplicationRunner {
