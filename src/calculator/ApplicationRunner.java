@@ -2,6 +2,8 @@ package calculator;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Stack;
 
 class Calculator extends JFrame{
     public Calculator () {
@@ -14,6 +16,53 @@ class Calculator extends JFrame{
 
         setLayout(null); // sets absolute positioning of components
         setVisible(true);
+    }
+    public static String PostfixConverter (String equation) {
+        String result = "";
+        String operator = "";
+        for (int i = 0; i < equation.length(); i++) {
+            char c = equation.charAt(i);
+            if (i == 0) {
+                result += equation.charAt(i);
+            }
+                if (c == 'x') {
+                    result += equation.charAt(i + 1);
+                    result += c;
+                } else if (c == '÷') {
+                    result += equation.charAt(i + 1);
+                    result += c;
+                } else if (c == '-'){
+                    result += equation.charAt(i + 1);
+                    operator += c;
+                } else if (c == '+') {
+                    result += equation.charAt(i + 1);
+                    operator += c;
+                }
+            }
+
+        result += operator;
+        return result;
+    }
+    public static double calculate(String equation) {
+        Stack<Double> stack = new Stack<>();
+        for (int i = 0; i < equation.length(); i++) {
+            char c = equation.charAt(i);
+            if (Character.isDigit(c)) {
+                stack.push((double) (c - '0'));
+            }  else
+            {
+                double val1 = stack.pop();
+                double val2 = stack.pop();
+
+                switch (c) {
+                    case '+' -> stack.push(val2 + val1);
+                    case '-' -> stack.push(val2 - val1);
+                    case '÷' -> stack.push(val2 / val1);
+                    case 'x' -> stack.push(val2 * val1);
+                }
+            }
+        }
+        return stack.pop();
     }
     public void initComponents() {
         /**
@@ -288,28 +337,37 @@ class Calculator extends JFrame{
         add(Equals);
         Equals.addActionListener(e -> {
             String equation = EquationLabel.getText();
-            String[] arrayOfString = equation.split("[÷x+-]");
+            double result;
+            result = calculate(PostfixConverter(equation));
+/*            String[] arrayOfString = equation.split("[÷x+-]");
             double[] array = new double[arrayOfString.length];
             for (int i = 0; i < array.length; i++) {
                 array[i] = Double.parseDouble(arrayOfString[i]);
             }
-/*            array[0] = Integer.parseInt(arrayOfString[0]);
-            array[1] = Integer.parseInt(arrayOfString[1]);*/
+            ArrayList<Character> arrayOfOperators = new ArrayList<>();
+*//*            array[0] = Integer.parseInt(arrayOfString[0]);
+            array[1] = Integer.parseInt(arrayOfString[1]);*//*
             String operator = "";
-            double result = 0;
+
             for (int i = 0; i < equation.length(); i++) {
                 operator += equation.charAt(i);
                 if (operator.matches("[0-9]||.[0-9]")) {
                     operator = "";
                 } else if (operator.matches("[÷x+-]")){
                     switch (operator) {
-                        case "+" -> result = array[0] + array[1];
+                        case "+" -> arrayOfOperators.add('+');
+                        case "-" -> arrayOfOperators.add('-');
+                        case "÷" -> arrayOfOperators.add('/');
+                        case "x" -> arrayOfOperators.add('*');
+*//*                        case "+" -> result = array[0] + array[1];
                         case "-" -> result = array[0] - array[1];
                         case "÷" -> result = array[0] / array[1];
-                        case "x" -> result = array[0] * array[1];
+                        case "x" -> result = array[0] * array[1];*//*
+
                     }
+                    //operator = "";
                 }
-            }
+            }*/
             String stringResult = String.format("%.1f", result);
             String[] arrayWithoutComma = stringResult.split(",");
             if (arrayWithoutComma[1].equals("0")) {
