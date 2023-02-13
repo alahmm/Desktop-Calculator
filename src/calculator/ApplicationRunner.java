@@ -259,7 +259,7 @@ class Calculator extends JFrame{
         add(Dot);
         Dot.addActionListener(e -> {
             String content = EquationLabel.getText();
-            //content = ",";
+            //content += ",";
             content += Dot.getText();
             EquationLabel.setText(content);
         });
@@ -288,21 +288,24 @@ class Calculator extends JFrame{
         add(Equals);
         Equals.addActionListener(e -> {
             String equation = EquationLabel.getText();
-            int[] array = new int[2];
-            String[] arrayOfString = equation.split("[+-/x]");
-            array[0] = Integer.parseInt(arrayOfString[0]);
-            array[1] = Integer.parseInt(arrayOfString[1]);
+            String[] arrayOfString = equation.split("[÷x+-]");
+            double[] array = new double[arrayOfString.length];
+            for (int i = 0; i < array.length; i++) {
+                array[i] = Double.parseDouble(arrayOfString[i]);
+            }
+/*            array[0] = Integer.parseInt(arrayOfString[0]);
+            array[1] = Integer.parseInt(arrayOfString[1]);*/
             String operator = "";
-            float result = 0;
+            double result = 0;
             for (int i = 0; i < equation.length(); i++) {
                 operator += equation.charAt(i);
-                if (operator.matches("\\d")) {
+                if (operator.matches("[0-9]||.[0-9]")) {
                     operator = "";
-                } else if (operator.matches("[+-/x]")){
+                } else if (operator.matches("[÷x+-]")){
                     switch (operator) {
                         case "+" -> result = array[0] + array[1];
                         case "-" -> result = array[0] - array[1];
-                        case "/" -> result = (float) array[0] / array[1];
+                        case "÷" -> result = array[0] / array[1];
                         case "x" -> result = array[0] * array[1];
                     }
                 }
@@ -313,6 +316,9 @@ class Calculator extends JFrame{
                 equation = arrayWithoutComma[0];
             } else {
                 equation = String.format("%f", result);
+                while (equation.charAt(equation.length() - 1) == '0') {
+                    equation = equation.substring(0, equation.length() - 1);
+                }
             }
             ResultLabel.setText(equation);
         });
