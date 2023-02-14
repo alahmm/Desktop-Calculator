@@ -3,6 +3,7 @@ package calculator;
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 class Calculator extends JFrame{
     public Calculator () {
@@ -123,7 +124,49 @@ class Calculator extends JFrame{
         }
         return stack.pop();
     }
+    public static String CommaCorrector(String content) {
+        String str = "";
+        List<Character> listOfContent = new ArrayList<>();
+        String[] array = content.split("\\.");
+        if (array.length > 1) {
+            if (!array[0].matches("[0-9]")) {
+                int i = content.indexOf('.');
+                for (int j = 0; j < content.length(); j++) {
+                    if (j != i) {
+                        listOfContent.add(content.charAt(j));
+                    } else {
+                        listOfContent.add('0');
+                        listOfContent.add('.');
+                    }
+                }
+                for (int j = 0; j < listOfContent.size(); j++) {
+                    str += listOfContent.get(j);
+                }
+            } else {
+                str += content;
+            }
+        } else {
+            str = "";
+            int i = content.indexOf('.');
+            for (int j = 0; j < content.length(); j++) {
+                if (j != i) {
+                    listOfContent.add(content.charAt(j));
+                } else {
+                    listOfContent.add('.');
+                    listOfContent.add('0');
+                }
+            }
+            for (int j = 0; j < listOfContent.size(); j++) {
+                str += listOfContent.get(j);
+            }
+        }
+        return str;
+    }
     public void initComponents() {
+        final String divideSymbol = "\u00F7";
+        final String multiplySymbol = "\u00D7";
+        final String addSymbol = "\u002B";
+        final String subtractSymbol = "-";
         /**
          * first label
          */
@@ -153,6 +196,7 @@ class Calculator extends JFrame{
         Delete.setText("Del");
         add(Delete);
         Delete.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content = content.substring(0, content.length() - 1);
             EquationLabel.setText(content);
@@ -166,6 +210,7 @@ class Calculator extends JFrame{
         Clear.setText("C");
         add(Clear);
         Clear.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             ResultLabel.setText("0");
             EquationLabel.setText("");
         });
@@ -180,6 +225,7 @@ class Calculator extends JFrame{
         Seven.setText("7");
         add(Seven);
         Seven.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Seven.getText();
             EquationLabel.setText(content);
@@ -191,6 +237,7 @@ class Calculator extends JFrame{
         Eight.setText("8");
         add(Eight);
         Eight.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Eight.getText();
             EquationLabel.setText(content);
@@ -202,6 +249,7 @@ class Calculator extends JFrame{
         Nine.setText("9");
         add(Nine);
         Nine.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Nine.getText();
             EquationLabel.setText(content);
@@ -213,9 +261,19 @@ class Calculator extends JFrame{
         Divide.setText("÷");
         add(Divide);
         Divide.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
-            content += Divide.getText();
-            EquationLabel.setText(content);
+            if (content.endsWith(divideSymbol) || content.endsWith(multiplySymbol) || content.endsWith(addSymbol)
+                    || content.endsWith(subtractSymbol)) {
+                content = content.substring(0, content.length() - 1);
+            }
+            if (content.contains(".")) {
+                content = CommaCorrector(content);
+            }
+            if (!content.isEmpty()) {
+                content += Divide.getText();
+                EquationLabel.setText(content);
+            }
         });
 
         JButton Four = new JButton();
@@ -224,6 +282,7 @@ class Calculator extends JFrame{
         Four.setText("4");
         add(Four);
         Four.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Four.getText();
             EquationLabel.setText(content);
@@ -235,6 +294,7 @@ class Calculator extends JFrame{
         Five.setText("5");
         add(Five);
         Five.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Five.getText();
             EquationLabel.setText(content);
@@ -246,6 +306,7 @@ class Calculator extends JFrame{
         Six.setText("6");
         add(Six);
         Six.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Six.getText();
             EquationLabel.setText(content);
@@ -257,9 +318,19 @@ class Calculator extends JFrame{
         Multiply.setText("×");
         add(Multiply);
         Multiply.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
-            content += Multiply.getText();
-            EquationLabel.setText(content);
+            if (content.endsWith(divideSymbol) || content.endsWith(multiplySymbol) || content.endsWith(addSymbol)
+                    || content.endsWith(subtractSymbol)) {
+                content = content.substring(0, content.length() - 1);
+            }
+            if (content.contains(".")) {
+                content = CommaCorrector(content);
+            }
+            if (!content.isEmpty()) {
+                content += Multiply.getText();
+                EquationLabel.setText(content);
+            }
         });
 
         JButton One = new JButton();
@@ -268,6 +339,7 @@ class Calculator extends JFrame{
         One.setText("1");
         add(One);
         One.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += One.getText();
             EquationLabel.setText(content);
@@ -279,6 +351,7 @@ class Calculator extends JFrame{
         Two.setText("2");
         add(Two);
         Two.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Two.getText();
             EquationLabel.setText(content);
@@ -290,6 +363,7 @@ class Calculator extends JFrame{
         Three.setText("3");
         add(Three);
         Three.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Three.getText();
             EquationLabel.setText(content);
@@ -301,9 +375,19 @@ class Calculator extends JFrame{
         Add.setText("+");
         add(Add);
         Add.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
-            content += Add.getText();
-            EquationLabel.setText(content);
+            if (content.endsWith(divideSymbol) || content.endsWith(multiplySymbol) || content.endsWith(addSymbol)
+                    || content.endsWith(subtractSymbol)) {
+                content = content.substring(0, content.length() - 1);
+            }
+            if (content.contains(".")) {
+                content = CommaCorrector(content);
+            }
+            if (!content.isEmpty()) {
+                content += Add.getText();
+                EquationLabel.setText(content);
+            }
         });
 
         JButton Dot = new JButton();
@@ -313,6 +397,7 @@ class Calculator extends JFrame{
         Dot.setBounds(10, 370, 60, 40);
         add(Dot);
         Dot.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Dot.getText();
             EquationLabel.setText(content);
@@ -325,6 +410,7 @@ class Calculator extends JFrame{
         Zero.setBounds(80, 370, 60, 40);
         add(Zero);
         Zero.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
             content += Zero.getText();
             EquationLabel.setText(content);
@@ -336,20 +422,26 @@ class Calculator extends JFrame{
         Equals.setName("Equals");
         add(Equals);
         Equals.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String equation = EquationLabel.getText();
             double result;
-            result = calculate(PostfixConverter(equation));
-            String stringResult = String.format("%.1f", result);
-            String[] arrayWithoutComma = stringResult.split(",");//\.
-            if (arrayWithoutComma[1].equals("0")) {
-                equation = arrayWithoutComma[0];
+            if (equation.endsWith(divideSymbol) || equation.endsWith(multiplySymbol) || equation.endsWith(addSymbol)
+                    || equation.endsWith(subtractSymbol) || equation.contains(divideSymbol + "0")) {
+                EquationLabel.setForeground(Color.RED.darker());
             } else {
-                equation = String.format("%f", result);
-                while (equation.charAt(equation.length() - 1) == '0') {
-                    equation = equation.substring(0, equation.length() - 1);
+                result = calculate(PostfixConverter(equation));
+                String stringResult = String.format("%.1f", result);
+                String[] arrayWithoutComma = stringResult.split(",");//\.
+                if (arrayWithoutComma[1].equals("0")) {
+                    equation = arrayWithoutComma[0];
+                } else {
+                    equation = String.format("%f", result);
+                    while (equation.charAt(equation.length() - 1) == '0') {
+                        equation = equation.substring(0, equation.length() - 1);
+                    }
                 }
+                ResultLabel.setText(equation);
             }
-            ResultLabel.setText(equation);
         });
 
         JButton Subtract = new JButton();
@@ -358,13 +450,22 @@ class Calculator extends JFrame{
         Subtract.setText("-");
         add(Subtract);
         Subtract.addActionListener(e -> {
+            EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
-            content += Subtract.getText();
-            EquationLabel.setText(content);
+            if (content.endsWith(divideSymbol) || content.endsWith(multiplySymbol) || content.endsWith(addSymbol)
+                    || content.endsWith(subtractSymbol)) {
+                content = content.substring(0, content.length() - 1);
+            }
+            if (content.contains(".")) {
+                content = CommaCorrector(content);
+            }
+            if (!content.isEmpty()) {
+                content += Subtract.getText();
+                EquationLabel.setText(content);
+            }
         });
     }
 }
-
 
 public class ApplicationRunner {
     public static void main(String[] args) {
