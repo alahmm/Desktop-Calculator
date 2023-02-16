@@ -6,6 +6,8 @@ import java.util.*;
 import java.util.List;
 
 class Calculator extends JFrame{
+    private static Stack<Double> stack;
+
     public Calculator () {
         super("Calculator");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -23,229 +25,122 @@ class Calculator extends JFrame{
         final String multiplySymbol = "\u00D7";
         final String addSymbol = "\u002B";
         final String subtractSymbol = "-";
-        final String squareRoot = "\\u221A";
-        final String powerOfTwo = "^(2)";
-        final String powerOfY = "^(";
-        switch (operator) {
-            case addSymbol:
-            case subtractSymbol:
-                return 1;
-
-            case multiplySymbol:
-            case divideSymbol:
-                return 2;
-
-            case powerOfTwo:
-            case powerOfY:
-                return 3;
-            case squareRoot:
-                return 4;
-        }
-        return -1;
+        final String squareRoot = "\u221A";
+        final String powerOfY = "^";
+        return switch (operator) {
+            case addSymbol, subtractSymbol -> 1;
+            case multiplySymbol, divideSymbol -> 2;
+            case squareRoot, powerOfY -> 3;
+            default -> -1;
+        };
     }
-    static String infixToPostfix(String exp)
-    {
-        // initializing empty String for result
+    public static String PostfixToInfixConverter(String equation) {
         String result = new String("");
-
-        // initializing empty stack
-        Deque<Character> stack
-                = new ArrayDeque<Character>();
-
-        for (int i = 0; i < exp.length(); ++i) {
-            char c = exp.charAt(i);
-
-            // If the scanned character is an
-            // operand, add it to output.
-            if (Character.isLetterOrDigit(c))
-                result += c;
-
-                // If the scanned character is an '(',
-                // push it to the stack.
-            else if (c == '(')
-                stack.push(c);
-
-                //  If the scanned character is an ')',
-                // pop and output from the stack
-                // until an '(' is encountered.
-            else if (c == ')') {
-                while (!stack.isEmpty()
-                        && stack.peek() != '(') {
-                    result += stack.peek();
-                    stack.pop();
+        Deque<Character> stack = new ArrayDeque<>();
+        for (int i = 0; i < equation.length(); i++) {
+            char c = equation.charAt(i);
+            if (Character.isDigit(c)) {
+                result += '(';
+                for (int j = i; j < equation.length(); j++) {
+                    char c2 = equation.charAt(j);
+                    if (Character.isDigit(c2) || c2 == '.') {
+                        result += c2;
+                        if (j == equation.length() - 1) {
+                            i = j;
+                        }
+                    } else {
+                        i = j - 1;
+                        break;
+                    }
                 }
-
+                result += ')';
+            }
+            else if (c == '(') {
+                stack.push(c);
+            } else if (c == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    result += stack.pop();
+                }
                 stack.pop();
-            }
-            else // an operator is encountered
-            {
-                String c2 = exp.substring(i, i + 1);
-                while (!stack.isEmpty()
-                        && Prec(c2) <= Prec(stack.peek().toString())) {
-
-                    result += stack.peek();
-                    stack.pop();
+                if ((!stack.isEmpty() && stack.peek() == '√') || (!stack.isEmpty() && stack.peek() == '^')) {
+                    result += stack.pop();
+                }
+            } else {
+                String s = "" + c;
+                while (!stack.isEmpty() && Prec(s) <= Prec(stack.peek().toString())) {
+                    result += stack.pop();
                 }
                 stack.push(c);
             }
         }
-
-        // pop all the operators from the stack
         while (!stack.isEmpty()) {
-            if (stack.peek() == '(')
-                return "Invalid Expression";
-            result += stack.peek();
-            stack.pop();
+            if (stack.peek() != '(') {
+                result += stack.pop();
+            }
         }
-
-        return result;
+        return  result;
     }
-    public static String PostfixConverter (String equation) {
-        final String divideSymbol = "\u00F7";
-        final String multiplySymbol = "\u00D7";
-        final String addSymbol = "\u002B";
-        final String subtractSymbol = "-";
-        String result = "";
-        String operator = "";
-        for (int i = 0; i < equation.length(); i++) {
-            String c = equation.substring(i, i + 1);
-            if (i == 0) {
-                result += '(';
-                for (int j = 0; j < equation.length(); j++) {
-                    char c2 = equation.charAt(j);
-                    if (Character.isDigit(c2)) {
-                        result += equation.charAt(j);
-                    } else if (c2 == '.') {
-                        result += equation.charAt(j);
-                    } else {
-                        break;
-                    }
-
-                }
-                result += ')';
-            }
-            if (c.equals(multiplySymbol) || c.equals(divideSymbol)) {
-                result += '(';
-                for (int j = i + 1; j <equation.length() ; j++) {
-                    char c2 = equation.charAt(j);
-                    if (Character.isDigit(c2)) {
-                        result += equation.charAt(j);
-                    } else if (c2 == '.') {
-                        result += equation.charAt(j);
-                    } else {
-                        break;
-                    }
-                }
-                result += ')';
-                result += c;
-            } else if (c.equals(subtractSymbol) || c.equals(addSymbol)) {
-                result += '(';
-                for (int j = i + 1; j < equation.length(); j++) {
-                    char c2 = equation.charAt(j);
-                    if (Character.isDigit(c2)) {
-                        result += equation.charAt(j);
-                    } else if (c2 == '.') {
-                        result += equation.charAt(j);
-                    } else {
-                        break;
-                    }
-                }
-                result += ')';
-                if (i < equation.length() - 3) {
-                    String s = equation.substring(i + 2, i + 3);
-                    if (s.equals(divideSymbol) || s.equals(multiplySymbol)) {
-                        operator += c;
-                    } else {
-                        result += c;
-                    }
-                } else {
-                    operator += c;
-                }
-            }
-        }
-        if (operator.length() > 0) {
-            String var = "";
-            for (int i = 0; i < operator.length(); i++) {
-                var += operator.charAt(operator.length() - 1 - i);
-            }
-            result += var;
-        }
-        return result;
-    }
-    public static double calculate(String equation) {
+    public static double calculate(String equation, JLabel EquationLabel) {
         String member = "";
         final String divideSymbol = "\u00F7";
         final String multiplySymbol = "\u00D7";
         final String addSymbol = "\u002B";
         final String subtractSymbol = "-";
-        final String squareRoot = "\\u221A";
-        final String powerOfTwo = "^(2)";
-        final String powerOfY = "^(";
-        Stack<Double> stack = new Stack<>();
-        for (int i = 0; i < equation.length(); i++) {
-            String c = equation.substring(i, i + 1);
-            if (c.matches("[0-9]")) {
-                for (int j = i; j <equation.length() ; j++) {
-                    char c2 = equation.charAt(j);
-                    if (Character.isDigit(c2)) {
-                        member += equation.charAt(j);
-                    } else if (c2 == '.') {
-                        member += equation.charAt(j);
-                    }else break;
-                }
-                stack.push(Double.parseDouble(member));
-                member = "";
-            } else if (c.equals(addSymbol) || c.equals(subtractSymbol) || c.equals(divideSymbol) || c.equals(multiplySymbol)) {
-
-                double val1 = stack.pop();
-                double val2 = stack.pop();
-
-                switch (c) {
-                    case addSymbol -> stack.push(val2 + val1);
-                    case subtractSymbol -> stack.push(val2 - val1);
-                    case divideSymbol -> stack.push(val2 / val1);
-                    case multiplySymbol -> stack.push(val2 * val1);
-                    //case squareRoot ->
-                }
-            }
-        }
-        return stack.pop();
-    }
-/*    public static double calculate(String equation) {
-        String member = "";
-        final String divideSymbol = "\u00F7";
-        final String multiplySymbol = "\u00D7";
-        final String addSymbol = "\u002B";
-        final String subtractSymbol = "-";
+        final String squareRoot = "\u221A";
+        final String powerOfY = "^";
         Stack<Double> stack = new Stack<>();
         for (int i = 0; i < equation.length(); i++) {
             String c = equation.substring(i, i + 1);
             if (c.equals("(")) {
                 for (int j = i + 1; j <equation.length() ; j++) {
                     char c2 = equation.charAt(j);
-                    if (Character.isDigit(c2)) {
+                    if (Character.isDigit(c2) || c2 == '.') {
                         member += equation.charAt(j);
-                    } else if (c2 == '.') {
-                        member += equation.charAt(j);
-                    }else break;
+                    } else {
+                        i = j;
+                        break;
+                    }
                 }
                 stack.push(Double.parseDouble(member));
                 member = "";
-            } else if (c.equals(addSymbol) || c.equals(subtractSymbol) || c.equals(divideSymbol) || c.equals(multiplySymbol)) {
-
+            } else {
                 double val1 = stack.pop();
-                double val2 = stack.pop();
-
-                switch (c) {
-                    case addSymbol -> stack.push(val2 + val1);
-                    case subtractSymbol -> stack.push(val2 - val1);
-                    case divideSymbol -> stack.push(val2 / val1);
-                    case multiplySymbol -> stack.push(val2 * val1);
+                if (stack.isEmpty()) {
+                    if (c.equals(squareRoot)) {
+                        if (val1 >= 0) {
+                            stack.push(Math.sqrt(val1));
+                        } else {
+                            EquationLabel.setForeground(Color.RED.darker());
+                        }
+                    } else {
+                        stack.push(-val1);
+                    }
+                } else {
+                    if (c.equals(squareRoot)) {
+                        if (val1 >= 0) {
+                            stack.push(Math.sqrt(val1));
+                        } else {
+                            EquationLabel.setForeground(Color.RED.darker());
+                        }
+                    } else {
+                        double val2 = stack.pop();
+                        switch (c) {
+                            case addSymbol -> stack.push(val2 + val1);
+                            case subtractSymbol -> stack.push(val2 - val1);
+                            case divideSymbol -> stack.push(val2 / val1);
+                            case multiplySymbol -> stack.push(val2 * val1);
+                            case powerOfY -> stack.push(Math.pow(val2, val1));
+                        }
+                    }
                 }
+
             }
         }
-        return stack.pop();
-    }*/
+        if (!stack.isEmpty()) {
+            return stack.pop();
+        }
+        return 0;
+    }
     public static String CommaCorrector(String content) {
         String str = "";
         List<Character> listOfContent = new ArrayList<>();
@@ -297,10 +192,6 @@ class Calculator extends JFrame{
         ResultLabel.setBounds(5,10, 255,120);
         add(ResultLabel);
         ResultLabel.setFont(ResultLabel. getFont(). deriveFont(40f));
-
-/*        Font font2 = new Font("Courier", Font.BOLD,12);
-        ResultLabel.setFont(font2);
-        ResultLabel.setFont(ResultLabel.getFont().deriveFont(20f));*/
 
         /**
          * second label
@@ -628,10 +519,19 @@ class Calculator extends JFrame{
         PlusMinus.addActionListener(e -> {
             EquationLabel.setForeground(Color.BLUE);
             String content = EquationLabel.getText();
-            if (!content.isEmpty()) {
+            Stack<String> stack1 = new Stack<>();
+            stack1.push(content);
+            if (content.startsWith("(-")) {
                 content = content.substring(2);
             } else {
-                content = "(-" + content;
+                if (content.contains(addSymbol) || content.contains(subtractSymbol)) {
+                    stack1.push("(-(");
+                } else {
+                    stack1.push("(-");
+                }
+                content = "";
+                content += stack1.pop();
+                content += stack1.pop();
             }
             EquationLabel.setText(content);
         });
@@ -649,19 +549,20 @@ class Calculator extends JFrame{
                     || equation.endsWith(subtractSymbol) || equation.contains(divideSymbol + "0")) {
                 EquationLabel.setForeground(Color.RED.darker());
             } else {
-                //result = calculate(PostfixConverter(equation));
-                result = calculate(infixToPostfix(equation));
-                String stringResult = String.format("%.1f", result);
-                String[] arrayWithoutComma = stringResult.split(",");//\.
-                if (arrayWithoutComma[1].equals("0")) {
-                    equation = arrayWithoutComma[0];
-                } else {
-                    equation = String.format("%f", result);
-                    while (equation.charAt(equation.length() - 1) == '0') {
-                        equation = equation.substring(0, equation.length() - 1);
+                result = calculate(PostfixToInfixConverter(equation), EquationLabel);
+                if (EquationLabel.getForeground() != Color.RED.darker()) {
+                    String stringResult = String.format("%.1f", result);
+                    String[] arrayWithoutComma = stringResult.split(",");//\.
+                    if (arrayWithoutComma[1].equals("0")) {
+                        equation = arrayWithoutComma[0];
+                    } else {
+                        equation = String.format("%f", result);
+                        while (equation.charAt(equation.length() - 1) == '0') {
+                            equation = equation.substring(0, equation.length() - 1);
+                        }
                     }
+                    ResultLabel.setText(equation);
                 }
-                ResultLabel.setText(equation);
             }
         });
 
